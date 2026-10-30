@@ -1,0 +1,1040 @@
+{
+  "districts": {
+    "242": "Bagalkot",
+    "244": "Belagavi",
+    "245": "Bellary",
+    "243": "Bengaluru",
+    "727": "Bengaluru Rural",
+    "728": "Bengaluru South",
+    "246": "Bidar",
+    "248": "Chamarajanagar",
+    "726": "Chikkaballapur",
+    "249": "Chikkamagaluru",
+    "250": "Chitradurga",
+    "262": "Dakshina Kannada",
+    "251": "Davangere",
+    "252": "Dharwad",
+    "253": "Gadag",
+    "254": "Hassan",
+    "255": "Haveri",
+    "256": "Kalaburagi",
+    "260": "Kodagu",
+    "258": "Kolar",
+    "259": "Koppal",
+    "261": "Mandya",
+    "263": "Mysuru",
+    "264": "Raichur",
+    "265": "Ramanagar",
+    "266": "Shivamogga",
+    "267": "Tumakuru",
+    "268": "Udupi",
+    "257": "Uttara Kannada",
+    "699": "Vijayanagara",
+    "247": "Vijayapura",
+    "269": "Yadgir"
+  },
+  "markets": [
+    {
+      "id": 108,
+      "name": "APMC Hubballi",
+      "district_id": 252,
+      "district_name": "Dharwad"
+    },
+    {
+      "id": 723,
+      "name": "APMC Kundagol",
+      "district_id": 252,
+      "district_name": "Dharwad"
+    },
+    {
+      "id": 3274,
+      "name": "APMC THIRTHAHALLI",
+      "district_id": 266,
+      "district_name": "Shivamogga"
+    },
+    {
+      "id": 3280,
+      "name": "Afzalpur APMC",
+      "district_id": 256,
+      "district_name": "Kalaburagi"
+    },
+    {
+      "id": 3402,
+      "name": "Alanda APMC",
+      "district_id": 256,
+      "district_name": "Kalaburagi"
+    },
+    {
+      "id": 505,
+      "name": "Annigeri APMC",
+      "district_id": 252,
+      "district_name": "Dharwad"
+    },
+    {
+      "id": 3403,
+      "name": "Arakalgud APMC",
+      "district_id": 254,
+      "district_name": "Hassan"
+    },
+    {
+      "id": 734,
+      "name": "Arasikere APMC",
+      "district_id": 254,
+      "district_name": "Hassan"
+    },
+    {
+      "id": 504,
+      "name": "Athani APMC",
+      "district_id": 244,
+      "district_name": "Belagavi"
+    },
+    {
+      "id": 705,
+      "name": "Aurad APMC",
+      "district_id": 246,
+      "district_name": "Bidar"
+    },
+    {
+      "id": 686,
+      "name": "Badami APMC",
+      "district_id": 242,
+      "district_name": "Bagalkot"
+    },
+    {
+      "id": 685,
+      "name": "Bagalkot APMC",
+      "district_id": 242,
+      "district_name": "Bagalkot"
+    },
+    {
+      "id": 3044,
+      "name": "Bagepalli APMC",
+      "district_id": 726,
+      "district_name": "Chikkaballapur"
+    },
+    {
+      "id": 692,
+      "name": "Bailahongal APMC",
+      "district_id": 244,
+      "district_name": "Belagavi"
+    },
+    {
+      "id": 103,
+      "name": "Ballari APMC",
+      "district_id": 245,
+      "district_name": "Bellary"
+    },
+    {
+      "id": 744,
+      "name": "Bangarpet APMC",
+      "district_id": 258,
+      "district_name": "Kolar"
+    },
+    {
+      "id": 720,
+      "name": "Bantwala APMC",
+      "district_id": 262,
+      "district_name": "Dakshina Kannada"
+    },
+    {
+      "id": 512,
+      "name": "Basava Kalayana APMC",
+      "district_id": 246,
+      "district_name": "Bidar"
+    },
+    {
+      "id": 101,
+      "name": "Belgaum APMC",
+      "district_id": 244,
+      "district_name": "Belagavi"
+    },
+    {
+      "id": 719,
+      "name": "Belthangdi APMC",
+      "district_id": 262,
+      "district_name": "Dakshina Kannada"
+    },
+    {
+      "id": 737,
+      "name": "Belur APMC",
+      "district_id": 254,
+      "district_name": "Hassan"
+    },
+    {
+      "id": 99,
+      "name": "Bengaluru APMC",
+      "district_id": 243,
+      "district_name": "Bengaluru"
+    },
+    {
+      "id": 755,
+      "name": "Bhadravathi APMC",
+      "district_id": 266,
+      "district_name": "Shivamogga"
+    },
+    {
+      "id": 704,
+      "name": "Bhalki APMC",
+      "district_id": 246,
+      "district_name": "Bidar"
+    },
+    {
+      "id": 104,
+      "name": "Bidar APMC",
+      "district_id": 246,
+      "district_name": "Bidar"
+    },
+    {
+      "id": 3279,
+      "name": "Bilagi APMC",
+      "district_id": 242,
+      "district_name": "Bagalkot"
+    },
+    {
+      "id": 100,
+      "name": "Binny Mill (FF&V) Bengaluru APMC",
+      "district_id": 243,
+      "district_name": "Bengaluru"
+    },
+    {
+      "id": 349,
+      "name": "Byadagi APMC",
+      "district_id": 255,
+      "district_name": "Haveri"
+    },
+    {
+      "id": 714,
+      "name": "Challakere APMC",
+      "district_id": 250,
+      "district_name": "Chitradurga"
+    },
+    {
+      "id": 707,
+      "name": "Chamarajanagar APMC",
+      "district_id": 248,
+      "district_name": "Chamarajanagar"
+    },
+    {
+      "id": 721,
+      "name": "Channagiri APMC",
+      "district_id": 251,
+      "district_name": "Davangere"
+    },
+    {
+      "id": 690,
+      "name": "Channapatna APMC",
+      "district_id": 728,
+      "district_name": "Bengaluru South"
+    },
+    {
+      "id": 501,
+      "name": "Channarayapatna APMC",
+      "district_id": 254,
+      "district_name": "Hassan"
+    },
+    {
+      "id": 742,
+      "name": "Chickkaballapura APMC",
+      "district_id": 726,
+      "district_name": "Chikkaballapur"
+    },
+    {
+      "id": 709,
+      "name": "Chikkamagaluru APMC",
+      "district_id": 249,
+      "district_name": "Chikkamagaluru"
+    },
+    {
+      "id": 733,
+      "name": "Chincholi APMC",
+      "district_id": 256,
+      "district_name": "Kalaburagi"
+    },
+    {
+      "id": 743,
+      "name": "Chintamani APMC",
+      "district_id": 726,
+      "district_name": "Chikkaballapur"
+    },
+    {
+      "id": 713,
+      "name": "Chitradurga APMC",
+      "district_id": 250,
+      "district_name": "Chitradurga"
+    },
+    {
+      "id": 511,
+      "name": "Chittapur APMC",
+      "district_id": 256,
+      "district_name": "Kalaburagi"
+    },
+    {
+      "id": 106,
+      "name": "Davangere APMC",
+      "district_id": 251,
+      "district_name": "Davangere"
+    },
+    {
+      "id": 3362,
+      "name": "Devadurga APMC",
+      "district_id": 264,
+      "district_name": "Raichur"
+    },
+    {
+      "id": 107,
+      "name": "Dharwar APMC",
+      "district_id": 252,
+      "district_name": "Dharwad"
+    },
+    {
+      "id": 489,
+      "name": "Doddaballapur APMC",
+      "district_id": 727,
+      "district_name": "Bengaluru Rural"
+    },
+    {
+      "id": 725,
+      "name": "Gadag APMC",
+      "district_id": 253,
+      "district_name": "Gadag"
+    },
+    {
+      "id": 111,
+      "name": "Gangavathi APMC",
+      "district_id": 259,
+      "district_name": "Koppal"
+    },
+    {
+      "id": 492,
+      "name": "Gauribidanur APMC",
+      "district_id": 726,
+      "district_name": "Chikkaballapur"
+    },
+    {
+      "id": 693,
+      "name": "Gokak APMC",
+      "district_id": 244,
+      "district_name": "Belagavi"
+    },
+    {
+      "id": 741,
+      "name": "Gonikappal APMC",
+      "district_id": 260,
+      "district_name": "Kodagu"
+    },
+    {
+      "id": 757,
+      "name": "Gubbi APMC",
+      "district_id": 267,
+      "district_name": "Tumakuru"
+    },
+    {
+      "id": 497,
+      "name": "Gundlupet APMC",
+      "district_id": 248,
+      "district_name": "Chamarajanagar"
+    },
+    {
+      "id": 513,
+      "name": "H.B. Halli APMC",
+      "district_id": 699,
+      "district_name": "Vijayanagara"
+    },
+    {
+      "id": 769,
+      "name": "Haliyala APMC",
+      "district_id": 257,
+      "district_name": "Uttara Kannada"
+    },
+    {
+      "id": 510,
+      "name": "Hanagal APMC",
+      "district_id": 255,
+      "district_name": "Haveri"
+    },
+    {
+      "id": 4714,
+      "name": "Hanuru APMC",
+      "district_id": 248,
+      "district_name": "Chamarajanagar"
+    },
+    {
+      "id": 484,
+      "name": "HarappanaHalli APMC",
+      "district_id": 251,
+      "district_name": "Davangere"
+    },
+    {
+      "id": 348,
+      "name": "Harihara APMC",
+      "district_id": 251,
+      "district_name": "Davangere"
+    },
+    {
+      "id": 735,
+      "name": "Hassan APMC",
+      "district_id": 254,
+      "district_name": "Hassan"
+    },
+    {
+      "id": 109,
+      "name": "Haveri APMC",
+      "district_id": 255,
+      "district_name": "Haveri"
+    },
+    {
+      "id": 738,
+      "name": "Hirekerur APMC",
+      "district_id": 255,
+      "district_name": "Haveri"
+    },
+    {
+      "id": 715,
+      "name": "Hiriyur APMC",
+      "district_id": 250,
+      "district_name": "Chitradurga"
+    },
+    {
+      "id": 3152,
+      "name": "Holalkere APMC",
+      "district_id": 250,
+      "district_name": "Chitradurga"
+    },
+    {
+      "id": 736,
+      "name": "Holenarsipura APMC",
+      "district_id": 254,
+      "district_name": "Hassan"
+    },
+    {
+      "id": 485,
+      "name": "Honnali APMC",
+      "district_id": 251,
+      "district_name": "Davangere"
+    },
+    {
+      "id": 765,
+      "name": "Honnavar APMC",
+      "district_id": 257,
+      "district_name": "Uttara Kannada"
+    },
+    {
+      "id": 702,
+      "name": "Hoovinahadagali APMC",
+      "district_id": 699,
+      "district_name": "Vijayanagara"
+    },
+    {
+      "id": 493,
+      "name": "Hosadurga APMC",
+      "district_id": 250,
+      "district_name": "Chitradurga"
+    },
+    {
+      "id": 3275,
+      "name": "Hosanagara APMC",
+      "district_id": 266,
+      "district_name": "Shivamogga"
+    },
+    {
+      "id": 3151,
+      "name": "Hoskote APMC",
+      "district_id": 727,
+      "district_name": "Bengaluru Rural"
+    },
+    {
+      "id": 701,
+      "name": "Hospet APMC",
+      "district_id": 699,
+      "district_name": "Vijayanagara"
+    },
+    {
+      "id": 758,
+      "name": "Huliyar APMC",
+      "district_id": 267,
+      "district_name": "Tumakuru"
+    },
+    {
+      "id": 703,
+      "name": "Humanabad APMC",
+      "district_id": 246,
+      "district_name": "Bidar"
+    },
+    {
+      "id": 687,
+      "name": "Hungund APMC",
+      "district_id": 242,
+      "district_name": "Bagalkot"
+    },
+    {
+      "id": 494,
+      "name": "Hunsur APMC",
+      "district_id": 263,
+      "district_name": "Mysuru"
+    },
+    {
+      "id": 3277,
+      "name": "Indi APMC",
+      "district_id": 247,
+      "district_name": "Vijayapura"
+    },
+    {
+      "id": 722,
+      "name": "Jagalur APMC",
+      "district_id": 251,
+      "district_name": "Davangere"
+    },
+    {
+      "id": 688,
+      "name": "Jamakhandi APMC",
+      "district_id": 242,
+      "district_name": "Bagalkot"
+    },
+    {
+      "id": 3281,
+      "name": "Jevargi APMC",
+      "district_id": 256,
+      "district_name": "Kalaburagi"
+    },
+    {
+      "id": 499,
+      "name": "K.R. Pet APMC",
+      "district_id": 261,
+      "district_name": "Mandya"
+    },
+    {
+      "id": 114,
+      "name": "K.R.Nagar APMC",
+      "district_id": 263,
+      "district_name": "Mysuru"
+    },
+    {
+      "id": 708,
+      "name": "Kadur APMC",
+      "district_id": 249,
+      "district_name": "Chikkamagaluru"
+    },
+    {
+      "id": 728,
+      "name": "Kalaburagi APMC",
+      "district_id": 256,
+      "district_name": "Kalaburagi"
+    },
+    {
+      "id": 507,
+      "name": "Kalaghatagi APMC",
+      "district_id": 252,
+      "district_name": "Dharwad"
+    },
+    {
+      "id": 3282,
+      "name": "Kampli APMC",
+      "district_id": 245,
+      "district_name": "Bellary"
+    },
+    {
+      "id": 4723,
+      "name": "Kanakagiri APMC",
+      "district_id": 259,
+      "district_name": "Koppal"
+    },
+    {
+      "id": 691,
+      "name": "Kanakapura APMC",
+      "district_id": 728,
+      "district_name": "Bengaluru South"
+    },
+    {
+      "id": 4669,
+      "name": "Karatagi APMC",
+      "district_id": 259,
+      "district_name": "Koppal"
+    },
+    {
+      "id": 495,
+      "name": "Karkala APMC",
+      "district_id": 268,
+      "district_name": "Udupi"
+    },
+    {
+      "id": 763,
+      "name": "Karwar APMC",
+      "district_id": 257,
+      "district_name": "Uttara Kannada"
+    },
+    {
+      "id": 112,
+      "name": "Kolar APMC",
+      "district_id": 258,
+      "district_name": "Kolar"
+    },
+    {
+      "id": 498,
+      "name": "Kollegal APMC",
+      "district_id": 248,
+      "district_name": "Chamarajanagar"
+    },
+    {
+      "id": 711,
+      "name": "Koppa APMC",
+      "district_id": 249,
+      "district_name": "Chikkamagaluru"
+    },
+    {
+      "id": 113,
+      "name": "Koppal APMC",
+      "district_id": 259,
+      "district_name": "Koppal"
+    },
+    {
+      "id": 700,
+      "name": "Kottur APMC",
+      "district_id": 699,
+      "district_name": "Vijayanagara"
+    },
+    {
+      "id": 694,
+      "name": "Kudchi APMC",
+      "district_id": 244,
+      "district_name": "Belagavi"
+    },
+    {
+      "id": 4733,
+      "name": "Kudligi APMC",
+      "district_id": 699,
+      "district_name": "Vijayanagara"
+    },
+    {
+      "id": 764,
+      "name": "Kumta APMC",
+      "district_id": 257,
+      "district_name": "Uttara Kannada"
+    },
+    {
+      "id": 810,
+      "name": "Kundapura APMC",
+      "district_id": 268,
+      "district_name": "Udupi"
+    },
+    {
+      "id": 759,
+      "name": "Kunigal APMC",
+      "district_id": 267,
+      "district_name": "Tumakuru"
+    },
+    {
+      "id": 747,
+      "name": "Kustagi APMC",
+      "district_id": 259,
+      "district_name": "Koppal"
+    },
+    {
+      "id": 724,
+      "name": "Laxmeshwar APMC",
+      "district_id": 253,
+      "district_name": "Gadag"
+    },
+    {
+      "id": 752,
+      "name": "Lingasugur APMC",
+      "district_id": 264,
+      "district_name": "Raichur"
+    },
+    {
+      "id": 749,
+      "name": "Maddur APMC",
+      "district_id": 261,
+      "district_name": "Mandya"
+    },
+    {
+      "id": 760,
+      "name": "Madhugiri APMC",
+      "district_id": 267,
+      "district_name": "Tumakuru"
+    },
+    {
+      "id": 739,
+      "name": "Madikeri APMC",
+      "district_id": 260,
+      "district_name": "Kodagu"
+    },
+    {
+      "id": 689,
+      "name": "Mahalingapur APMC",
+      "district_id": 242,
+      "district_name": "Bagalkot"
+    },
+    {
+      "id": 3758,
+      "name": "Malavalli APMC",
+      "district_id": 261,
+      "district_name": "Mandya"
+    },
+    {
+      "id": 490,
+      "name": "Malur APMC",
+      "district_id": 258,
+      "district_name": "Kolar"
+    },
+    {
+      "id": 748,
+      "name": "Mandya APMC",
+      "district_id": 261,
+      "district_name": "Mandya"
+    },
+    {
+      "id": 716,
+      "name": "Mangaluru APMC",
+      "district_id": 262,
+      "district_name": "Dakshina Kannada"
+    },
+    {
+      "id": 118,
+      "name": "Manvi APMC",
+      "district_id": 264,
+      "district_name": "Raichur"
+    },
+    {
+      "id": 4743,
+      "name": "Mudhol APMC",
+      "district_id": 242,
+      "district_name": "Bagalkot"
+    },
+    {
+      "id": 710,
+      "name": "Mudigere APMC",
+      "district_id": 249,
+      "district_name": "Chikkamagaluru"
+    },
+    {
+      "id": 1602,
+      "name": "Mulbagal APMC",
+      "district_id": 258,
+      "district_name": "Kolar"
+    },
+    {
+      "id": 727,
+      "name": "Mundaragi APMC",
+      "district_id": 253,
+      "district_name": "Gadag"
+    },
+    {
+      "id": 770,
+      "name": "Mundgod APMC",
+      "district_id": 257,
+      "district_name": "Uttara Kannada"
+    },
+    {
+      "id": 115,
+      "name": "Mysuru APMC",
+      "district_id": 263,
+      "district_name": "Mysuru"
+    },
+    {
+      "id": 500,
+      "name": "Nagamangala APMC",
+      "district_id": 261,
+      "district_name": "Mandya"
+    },
+    {
+      "id": 695,
+      "name": "Nandagada APMC",
+      "district_id": 244,
+      "district_name": "Belagavi"
+    },
+    {
+      "id": 750,
+      "name": "Nanjangud APMC",
+      "district_id": 263,
+      "district_name": "Mysuru"
+    },
+    {
+      "id": 726,
+      "name": "Nargunda APMC",
+      "district_id": 253,
+      "district_name": "Gadag"
+    },
+    {
+      "id": 696,
+      "name": "Nippani APMC",
+      "district_id": 244,
+      "district_name": "Belagavi"
+    },
+    {
+      "id": 1603,
+      "name": "Pandavapura APMC",
+      "district_id": 261,
+      "district_name": "Mandya"
+    },
+    {
+      "id": 487,
+      "name": "Pavagada APMC",
+      "district_id": 267,
+      "district_name": "Tumakuru"
+    },
+    {
+      "id": 119,
+      "name": "Periyapatna APMC",
+      "district_id": 263,
+      "district_name": "Mysuru"
+    },
+    {
+      "id": 717,
+      "name": "Puttur APMC",
+      "district_id": 262,
+      "district_name": "Dakshina Kannada"
+    },
+    {
+      "id": 116,
+      "name": "Raichur APMC",
+      "district_id": 264,
+      "district_name": "Raichur"
+    },
+    {
+      "id": 745,
+      "name": "Ramanagara APMC",
+      "district_id": 728,
+      "district_name": "Bengaluru South"
+    },
+    {
+      "id": 697,
+      "name": "Ramdurga APMC",
+      "district_id": 244,
+      "district_name": "Belagavi"
+    },
+    {
+      "id": 3756,
+      "name": "Rampura APMC",
+      "district_id": 250,
+      "district_name": "Chitradurga"
+    },
+    {
+      "id": 110,
+      "name": "Ranebennur APMC",
+      "district_id": 255,
+      "district_name": "Haveri"
+    },
+    {
+      "id": 506,
+      "name": "Rona APMC",
+      "district_id": 253,
+      "district_name": "Gadag"
+    },
+    {
+      "id": 102,
+      "name": "SIRGUPPA APMC",
+      "district_id": 245,
+      "district_name": "Bellary"
+    },
+    {
+      "id": 754,
+      "name": "Sagar APMC",
+      "district_id": 266,
+      "district_name": "Shivamogga"
+    },
+    {
+      "id": 502,
+      "name": "Sakaleshpura APMC",
+      "district_id": 254,
+      "district_name": "Hassan"
+    },
+    {
+      "id": 3759,
+      "name": "Sandur APMC",
+      "district_id": 699,
+      "district_name": "Vijayanagara"
+    },
+    {
+      "id": 699,
+      "name": "Sankeshwar APMC",
+      "district_id": 244,
+      "district_name": "Belagavi"
+    },
+    {
+      "id": 751,
+      "name": "Santhesargur APMC",
+      "district_id": 263,
+      "district_name": "Mysuru"
+    },
+    {
+      "id": 508,
+      "name": "Savanur APMC",
+      "district_id": 255,
+      "district_name": "Haveri"
+    },
+    {
+      "id": 729,
+      "name": "Shahapur APMC",
+      "district_id": 269,
+      "district_name": "Yadgir"
+    },
+    {
+      "id": 1604,
+      "name": "Shiggoan APMC",
+      "district_id": 255,
+      "district_name": "Haveri"
+    },
+    {
+      "id": 486,
+      "name": "Shikaripura APMC",
+      "district_id": 266,
+      "district_name": "Shivamogga"
+    },
+    {
+      "id": 753,
+      "name": "Shimoga APMC",
+      "district_id": 266,
+      "district_name": "Shivamogga"
+    },
+    {
+      "id": 730,
+      "name": "Shorapur APMC",
+      "district_id": 269,
+      "district_name": "Yadgir"
+    },
+    {
+      "id": 766,
+      "name": "Siddapur APMC",
+      "district_id": 257,
+      "district_name": "Uttara Kannada"
+    },
+    {
+      "id": 706,
+      "name": "Sindagi APMC",
+      "district_id": 247,
+      "district_name": "Vijayapura"
+    },
+    {
+      "id": 117,
+      "name": "Sindhanur APMC",
+      "district_id": 264,
+      "district_name": "Raichur"
+    },
+    {
+      "id": 761,
+      "name": "Sira APMC",
+      "district_id": 267,
+      "district_name": "Tumakuru"
+    },
+    {
+      "id": 768,
+      "name": "Sirsi APMC",
+      "district_id": 257,
+      "district_name": "Uttara Kannada"
+    },
+    {
+      "id": 740,
+      "name": "Somvarpet APMC",
+      "district_id": 260,
+      "district_name": "Kodagu"
+    },
+    {
+      "id": 3146,
+      "name": "Sorabha APMC",
+      "district_id": 266,
+      "district_name": "Shivamogga"
+    },
+    {
+      "id": 698,
+      "name": "Soundati APMC",
+      "district_id": 244,
+      "district_name": "Belagavi"
+    },
+    {
+      "id": 491,
+      "name": "Srinivasapur APMC",
+      "district_id": 258,
+      "district_name": "Kolar"
+    },
+    {
+      "id": 2030,
+      "name": "Srirangapattana APMC",
+      "district_id": 261,
+      "district_name": "Mandya"
+    },
+    {
+      "id": 718,
+      "name": "Sulya APMC",
+      "district_id": 262,
+      "district_name": "Dakshina Kannada"
+    },
+    {
+      "id": 496,
+      "name": "T. Narasipura APMC",
+      "district_id": 263,
+      "district_name": "Mysuru"
+    },
+    {
+      "id": 509,
+      "name": "Talikot APMC",
+      "district_id": 247,
+      "district_name": "Vijayapura"
+    },
+    {
+      "id": 503,
+      "name": "Tarikere APMC",
+      "district_id": 249,
+      "district_name": "Chikkamagaluru"
+    },
+    {
+      "id": 762,
+      "name": "Tiptur APMC",
+      "district_id": 267,
+      "district_name": "Tumakuru"
+    },
+    {
+      "id": 756,
+      "name": "Tumakuru APMC",
+      "district_id": 267,
+      "district_name": "Tumakuru"
+    },
+    {
+      "id": 488,
+      "name": "Turvekere APMC",
+      "district_id": 267,
+      "district_name": "Tumakuru"
+    },
+    {
+      "id": 823,
+      "name": "Udupi APMC",
+      "district_id": 268,
+      "district_name": "Udupi"
+    },
+    {
+      "id": 105,
+      "name": "Vijayapura APMC",
+      "district_id": 247,
+      "district_name": "Vijayapura"
+    },
+    {
+      "id": 732,
+      "name": "Yadgir APMC",
+      "district_id": 269,
+      "district_name": "Yadgir"
+    },
+    {
+      "id": 746,
+      "name": "Yalburga APMC",
+      "district_id": 259,
+      "district_name": "Koppal"
+    },
+    {
+      "id": 4796,
+      "name": "Yaragatti  APMC",
+      "district_id": 244,
+      "district_name": "Belagavi"
+    },
+    {
+      "id": 767,
+      "name": "Yellapur APMC",
+      "district_id": 257,
+      "district_name": "Uttara Kannada"
+    },
+    {
+      "id": 731,
+      "name": "sedam",
+      "district_id": 256,
+      "district_name": "Kalaburagi"
+    }
+  ]
+}
