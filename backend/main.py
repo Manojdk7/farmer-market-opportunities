@@ -69,6 +69,7 @@ SYNC_STATUS = {
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    Base.metadata.create_all(bind=engine)
     migrate_price_observations(engine)
     migrate_auth_tables(engine)
     if os.getenv("SEED_DEMO_DATA") == "1":

@@ -11,10 +11,15 @@ class Base(DeclarativeBase):
 
 
 def get_database_url():
-    return os.getenv(
+    url = os.getenv(
         "DATABASE_URL",
         f"sqlite:///{(Path(__file__).resolve().parent / 'farmer_market.db').as_posix()}",
     )
+    if url.startswith("postgres://"):
+        return "postgresql+psycopg://" + url.removeprefix("postgres://")
+    if url.startswith("postgresql://"):
+        return "postgresql+psycopg://" + url.removeprefix("postgresql://")
+    return url
 
 
 def create_database_engine(database_url=None):

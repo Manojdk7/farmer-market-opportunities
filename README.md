@@ -45,15 +45,18 @@ An offline-capable, Kannada-first selling-decision aid that estimates net procee
 
 ### Production deployment (Vercel + Render)
 
-The deployment configuration is prepared for a Vercel frontend and a Render FastAPI service:
+The deployment configuration is prepared for a Vercel frontend and a free Render FastAPI service using Neon Postgres for persistent data:
 
 1. Push this project to a Git provider that both Vercel and Render can access.
-2. In Render, create a Blueprint from the repository and select `backend/render.yaml`. The service uses a persistent disk for SQLite and enables secure session cookies. The `starter` plan is required because Render's free web services do not provide persistent disks.
-3. Wait for the API health check at `/health` to pass. If Render assigns a different service hostname, update the API hostname in `frontend/vercel.json`.
-4. In Vercel, import the same repository and set the project Root Directory to `frontend`. Use `npm run build` as the build command and `dist` as the output directory. The Vercel rewrite sends `/api/*` requests through the frontend origin so browser authentication cookies remain first-party.
-5. Deploy, then test registration, login, refresh, logout, calculator API, and market-data requests on the Vercel URL. Confirm a redeploy does not reset data by creating a test account/record and checking it after a Render restart.
+2. Create a free Postgres project on [Neon](https://neon.tech/), then copy its pooled or direct connection string. Keep the connection string private.
+3. In Render, create a Blueprint from the repository and select `backend/render.yaml`. The service uses Render's free web-service plan and will prompt for `DATABASE_URL`; paste the Neon connection string there. There is intentionally no SQLite file or disk attached because Render free web services have ephemeral filesystems. The backend creates its SQLAlchemy tables at startup; SQLite-only legacy migrations are skipped for Postgres.
+4. Wait for the API health check at `/health` to pass. If Render assigns a different service hostname, update the API hostname in `frontend/vercel.json`.
+5. In Vercel, import the same repository and set the project Root Directory to `frontend`. Use `npm run build` as the build command and `dist` as the output directory. The Vercel rewrite sends `/api/*` requests through the frontend origin so browser authentication cookies remain first-party.
+6. Deploy, then test registration, login, refresh, logout, calculator API, and market-data requests on the Vercel URL. Verify data remains after a Render restart.
 
-Do not add production credentials or admin tokens to source control. The Render SQLite database persists on its mounted disk; keep independent backups before schema changes or maintenance.
+Free hosting has limits: Render free web services sleep after inactivity and can take about a minute to wake. Neon Free also has usage limits; review its current plan and limits before relying on it. Render's own free Postgres expires after 30 days, so this guide uses Neon instead. These free tiers are suitable for demos and testing, not guaranteed production availability.
+
+Do not add production credentials, database URLs, or admin tokens to source control. Back up the database independently before schema changes or maintenance.
 
 ## Backend API and SQLite
 
