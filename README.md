@@ -14,6 +14,7 @@ An offline-capable, Kannada-first selling-decision aid that estimates net procee
 - **Offline Fallback**: If the backend fails, it calculates locally and displays an "Offline" badge.
 - **Trust Indicators**: Mandatory disclaimers about unconfirmed buyers and estimated ranges.
 - **Market Price Overview**: The dashboard browses stored API market observations, source/date details, and sample-data labels before using a supported INR price per kg in the calculator. Browser-entered observations remain local and are not uploaded.
+- **APMC Comparison**: Selecting a crop and APMC market in the comparison form loads that market's latest verified price, converts it to INR/kg for a like-for-like estimate, and saves the comparison and its price-observation reference in the backend database. Draft option details are also saved in the browser.
 - **Price Provenance**: Stored observations show source, unit, data type, verification, freshness, and ranking eligibility; manual writes require a backend-configured admin token.
 - **Transport Sensitivity**: The selling-option comparison calculates break-even total transport costs and lets farmers test alternate quotes without changing the saved comparison. Quote validity and loading, unloading, waiting, and toll charges must be reviewed before an option can be treated as a complete comparison.
 

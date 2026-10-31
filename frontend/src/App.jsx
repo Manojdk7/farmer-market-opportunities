@@ -435,6 +435,7 @@ export default function App() {
   const [options, setOptions] = useState(() => loadedCollections.options.records.length
     ? loadedCollections.options.records
     : [createOption(language === 'kn' ? 'ಸ್ಥಳೀಯ ಎಪಿಎಂಸಿ' : 'Local APMC'), createOption(language === 'kn' ? 'ಹತ್ತಿರದ ಮಾರುಕಟ್ಟೆ' : 'Nearby Market')])
+  const optionsRef = useRef(options)
   const [storageNotice, setStorageNotice] = useState([
     loadedCollections.calculations.error,
     loadedCollections.observations.error,
@@ -449,6 +450,10 @@ export default function App() {
   const [optionErrors, setOptionErrors] = useState({})
   const [comparisonResults, setComparisonResults] = useState(null)
   const [comparisonBase, setComparisonBase] = useState(null)
+  const [comparisonSaveMessage, setComparisonSaveMessage] = useState('')
+  const [comparisonPriceMessages, setComparisonPriceMessages] = useState({})
+  const comparisonPriceRequestIds = useRef(new Map())
+  const comparisonSyncPromises = useRef(new Map())
   const [transportScenarioCosts, setTransportScenarioCosts] = useState({})
   const [pooledFarmers, setPooledFarmers] = useState('2')
   const [pooledQuintals, setPooledQuintals] = useState('50')
@@ -787,17 +792,189 @@ export default function App() {
     }
   }
 
-  const updateOption = (id, updates) => {
-    setOptions((current) => current.map((option) => (option.id === id ? { ...option, ...updates, saved: false } : option)))
+  const updateOption = (id, updates, { preserveMarketEvidence = false } = {}) => {
+    const clearsMarketEvidence = !preserveMarketEvidence
+      && ['price', 'priceDate', 'source'].some((key) => Object.hasOwn(updates, key))
+    const invalidatesMarketRequest = !preserveMarketEvidence
+      && ['name', 'marketId', 'price', 'priceDate', 'source'].some((key) => Object.hasOwn(updates, key))
+    if (invalidatesMarketRequest) {
+      comparisonPriceRequestIds.current.set(
+        id,
+        (comparisonPriceRequestIds.current.get(id) ?? 0) + 1,
+      )
+    }
+    const nextOptions = optionsRef.current.map((option) => (
+      option.id === id
+        ? {
+          ...option,
+          ...updates,
+          ...(clearsMarketEvidence
+            ? {
+              priceObservationId: null,
+              ...(['price', 'priceDate'].some((key) => Object.hasOwn(updates, key))
+                && option.source === 'AGMARKNET (Official)'
+                && !Object.hasOwn(updates, 'source')
+                ? { source: '' }
+                : {}),
+            }
+            : {}),
+          saved: false,
+        }
+        : option
+    ))
+    optionsRef.current = nextOptions
+    setOptions(nextOptions)
+    persistOptions(nextOptions)
     setOptionErrors((current) => ({ ...current, [id]: undefined }))
     setComparisonResults(null)
     setDecision(null)
+    setComparisonSaveMessage('')
+    if (invalidatesMarketRequest) {
+      setComparisonPriceMessages((current) => ({ ...current, [id]: '' }))
+    }
+  }
+
+  const selectComparisonMarket = async (optionId, market, crop = comparisonCommodity, skipPendingSync = false) => {
+    const requestId = (comparisonPriceRequestIds.current.get(optionId) ?? 0) + 1
+    comparisonPriceRequestIds.current.set(optionId, requestId)
+    updateOption(optionId, {
+      name: market?.name ?? '',
+      marketId: market?.id ?? null,
+      priceObservationId: null,
+      price: '',
+      priceDate: '',
+      source: '',
+    }, { preserveMarketEvidence: true })
+    setComparisonPriceMessages((current) => ({
+      ...current,
+      [optionId]: market
+        ? (language === 'kn' ? 'ಈ ಎಪಿಎಂಸಿ ಬೆಲೆಯನ್ನು ಪಡೆಯಲಾಗುತ್ತಿದೆ…' : 'Loading this APMC price…')
+        : '',
+    }))
+    if (!market) return
+    if (!market.id) {
+      setComparisonPriceMessages((current) => ({
+        ...current,
+        [optionId]: language === 'kn'
+          ? 'ಈ ಆಯ್ಕೆಗೆ ಬೆಲೆಯನ್ನು ಕೈಯಾರೆ ನಮೂದಿಸಿ.'
+          : 'Enter a price manually for this non-APMC option.',
+      }))
+      return
+    }
+
+    try {
+      const syncKey = `${selectedDistrict}|${crop}`
+      const pendingSync = skipPendingSync ? null : comparisonSyncPromises.current.get(syncKey)
+      if (pendingSync) await pendingSync
+      if (comparisonPriceRequestIds.current.get(optionId) !== requestId) return
+      const params = new URLSearchParams({
+        district: selectedDistrict,
+        market_id: String(market.id),
+        commodity: crop,
+        limit: '200',
+      })
+      const response = await fetch(`/api/price-observations?${params}`)
+      if (!response.ok) throw new Error('Could not load market observations.')
+      const data = await response.json()
+      if (comparisonPriceRequestIds.current.get(optionId) !== requestId) return
+      const observation = data.items
+        .filter((item) => item.market_id === market.id
+          && item.commodity === crop
+          && item.data_type === 'official'
+          && item.verification_status === 'verified'
+          && !item.is_sample
+          && item.observation_date
+          && Number.isFinite(pricePerKilogram(item.modal_price || item.price, item.unit)))
+        .sort((a, b) => b.observation_date.localeCompare(a.observation_date) || b.id - a.id)[0]
+      if (!observation) {
+        setComparisonPriceMessages((current) => ({
+          ...current,
+          [optionId]: language === 'kn'
+            ? `${getLocalizedCropName(crop, language)}ಗೆ ${getLocalizedMarketName(market.name, language)} ಮಾರುಕಟ್ಟೆಯಲ್ಲಿ ಅಧಿಕೃತ ಬೆಲೆ ದಾಖಲೆ ಲಭ್ಯವಿಲ್ಲ.`
+            : `No official ${crop} price is available for ${market.name}.`,
+        }))
+        return
+      }
+
+      const normalizedPrice = pricePerKilogram(observation.modal_price || observation.price, observation.unit)
+      updateOption(optionId, {
+        price: String(normalizedPrice),
+        priceDate: observation.observation_date,
+        source: 'AGMARKNET (Official)',
+        priceObservationId: observation.id,
+      }, { preserveMarketEvidence: true })
+      setComparisonPriceMessages((current) => ({
+        ...current,
+        [optionId]: language === 'kn'
+          ? `AGMARKNET: ${formatUnitString(observation.unit, language)} ದರವನ್ನು ₹/ಕೆ.ಜಿ.ಗೆ ಪರಿವರ್ತಿಸಲಾಗಿದೆ · ${observation.observation_date}`
+          : `AGMARKNET ${formatUnitString(observation.unit, language)} price converted to ₹/kg · ${observation.observation_date}`,
+      }))
+    } catch {
+      if (comparisonPriceRequestIds.current.get(optionId) === requestId) {
+        setComparisonPriceMessages((current) => ({
+          ...current,
+          [optionId]: language === 'kn'
+            ? 'ಈ ಎಪಿಎಂಸಿ ಬೆಲೆಯನ್ನು ಪಡೆಯಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಬೆಲೆಯನ್ನು ಕೈಯಾರೆ ನಮೂದಿಸಿ.'
+            : 'Could not load this APMC price. Retry or enter the price manually.',
+        }))
+      }
+    }
+  }
+
+  const handleComparisonCropChange = (crop) => {
+    setComparisonCommodity(crop)
+    setErrors((current) => ({ ...current, commodity: undefined }))
+    setComparisonResults(null)
+    setDecision(null)
+    if (crop !== comparisonCommodity) {
+      const clearedOptions = optionsRef.current.map((option) => ({
+        ...option,
+        price: '',
+        priceDate: '',
+        source: '',
+        priceObservationId: null,
+        saved: false,
+      }))
+      optionsRef.current = clearedOptions
+      setOptions(clearedOptions)
+      persistOptions(clearedOptions)
+      setComparisonPriceMessages({})
+      for (const option of clearedOptions) {
+        comparisonPriceRequestIds.current.set(
+          option.id,
+          (comparisonPriceRequestIds.current.get(option.id) ?? 0) + 1,
+        )
+      }
+    }
+    if (!crop || !browserOnline) return
+
+    const syncKey = `${selectedDistrict}|${crop}`
+    const selectedMarkets = optionsRef.current
+      .filter((option) => option.marketId)
+      .map((option) => ({
+        optionId: option.id,
+        market: backendMarkets.find((item) => item.id === option.marketId),
+      }))
+      .filter(({ market }) => market)
+    const syncPromise = triggerMarketSync(selectedDistrict, crop)
+      .then(async () => {
+        for (const { optionId, market } of selectedMarkets) {
+          await selectComparisonMarket(optionId, market, crop, true)
+        }
+      })
+      .finally(() => {
+        if (comparisonSyncPromises.current.get(syncKey) === syncPromise) {
+          comparisonSyncPromises.current.delete(syncKey)
+        }
+      })
+    comparisonSyncPromises.current.set(syncKey, syncPromise)
   }
 
   const addOption = () => {
     if (options.length >= 3) return
     const nextIndex = options.length + 1
     const nextOptions = [...options, createOption(language === 'kn' ? `ಮಾರಾಟದ ಆಯ್ಕೆ ${nextIndex}` : `Selling Option ${nextIndex}`)]
+    optionsRef.current = nextOptions
     setOptions(nextOptions)
     persistOptions(nextOptions)
     setComparisonResults(null)
@@ -807,6 +984,7 @@ export default function App() {
   const removeOption = (id) => {
     if (options.length <= 1) return
     const nextOptions = options.filter((option) => option.id !== id)
+    optionsRef.current = nextOptions
     setOptions(nextOptions)
     persistOptions(nextOptions)
     setComparisonResults(null)
@@ -815,6 +993,7 @@ export default function App() {
 
   const saveDraft = (id) => {
     const nextOptions = options.map((option) => (option.id === id ? { ...option, saved: true } : option))
+    optionsRef.current = nextOptions
     setOptions(nextOptions)
     persistOptions(nextOptions)
   }
@@ -829,6 +1008,7 @@ export default function App() {
     const issuesById = {}
     const fieldErrorsById = {}
     const savedOptions = options.map((option) => ({ ...option, saved: true }))
+    optionsRef.current = savedOptions
     setOptions(savedOptions)
     persistOptions(savedOptions)
     for (const option of savedOptions) {
@@ -844,6 +1024,7 @@ export default function App() {
     }
 
     setComparisonBase(base)
+    setComparisonSaveMessage('')
     setIsComparing(true)
     let resultsById = {}
     let calculationMode = 'api'
@@ -857,28 +1038,45 @@ export default function App() {
     }))
 
     try {
-      const response = await fetch('/api/compare', {
+      const response = await fetch('/api/comparisons', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          common_inputs: base,
+          commodity: comparisonCommodity.trim(),
+          quantity: base.q,
+          quantity_unit: 'kg',
+          physical_loss_percent: base.l * 100,
+          calculation_inputs: {
+            d: base.d,
+            ch: base.ch,
+            cp: base.cp,
+            cm: base.cm,
+            co: base.co,
+          },
           options: savedOptions.map((option) => ({
             client_id: option.id,
             name: option.name,
             price: Number(option.price),
-            transport_quote: Number(option.transportQuote || 0),
-            commodity: comparisonCommodity.trim(),
-            variety: option.qualityRequirements.trim() || null,
+            market_id: option.marketId ? Number(option.marketId) : null,
+            price_observation_id: option.priceObservationId || null,
+            price_unit: 'INR/kg',
             price_date: option.priceDate || null,
             source: option.source.trim() || null,
             distance_km: Number(option.distance || 0),
-            transport_quote_valid_until: option.transportQuoteValidUntil || null,
+            transport_cost: Number(option.transportQuote || 0),
+            transport_source: 'Farmer-entered transport quote',
+            transport_status: option.transportQuoteValidUntil
+              && option.transportQuoteValidUntil < new Date().toISOString().slice(0, 10)
+              ? 'expired'
+              : 'estimated',
+            quality_requirements: option.qualityRequirements.trim() || null,
+            quality_comparable: option.qualityComparable,
             payment_terms: option.paymentCategory || null,
-            buyer_confirmation_status: option.confirmation || null,
+            confirmation_status: option.confirmation || 'unconfirmed',
           })),
         }),
       })
-      if (!response.ok) throw new Error('API compare request failed')
+      if (!response.ok) throw new Error('API comparison save failed')
       const comparison = await response.json()
       const responseResults = comparison.results?.items
       if (!Array.isArray(responseResults)) throw new Error('API returned an invalid comparison')
@@ -890,10 +1088,17 @@ export default function App() {
       if (requests.some(({ option }) => !Number.isFinite(resultsById[option.id]?.net_proceeds))) {
         throw new Error('API returned an incomplete comparison')
       }
-    } catch {
+      setIsOffline(false)
+      setComparisonSaveMessage(language === 'kn'
+        ? `ಹೋಲಿಕೆ #${comparison.id} ಸರ್ವರ್‌ನಲ್ಲಿ ಉಳಿಸಲಾಗಿದೆ.`
+        : `Comparison #${comparison.id} saved to the server database.`)
+    } catch (error) {
       calculationMode = 'offline'
       resultsById = Object.fromEntries(requests.map(({ option, inputs }) => [option.id, calculateLocally(inputs)]))
       setIsOffline(true)
+      setComparisonSaveMessage(language === 'kn'
+        ? 'ಸರ್ವರ್‌ನಲ್ಲಿ ಹೋಲಿಕೆಯನ್ನು ಉಳಿಸಲಾಗಲಿಲ್ಲ. ಫಲಿತಾಂಶ ಈ ಸಾಧನದಲ್ಲಿ ಮಾತ್ರ ಉಳಿಸಲಾಗಿದೆ.'
+        : 'Could not save this comparison to the server. Results are saved on this device only.')
     } finally {
       setIsComparing(false)
     }
@@ -930,6 +1135,7 @@ export default function App() {
 
   const resetOptions = () => {
     const nextOptions = [createOption(language === 'kn' ? 'ಸ್ಥಳೀಯ ಎಪಿಎಂಸಿ' : 'Local APMC'), createOption(language === 'kn' ? 'ಹತ್ತಿರದ ಮಾರುಕಟ್ಟೆ' : 'Nearby Market')]
+    optionsRef.current = nextOptions
     setOptions(nextOptions)
     persistOptions(nextOptions)
     setOptionErrors({})
@@ -1963,6 +2169,7 @@ export default function App() {
           </span>
         </div>
         <p className="section-intro">{t('comparison_intro', language)}</p>
+        {comparisonSaveMessage && <p className="ranking-status" role="status">{comparisonSaveMessage}</p>}
 
         <div className="input-group">
           <label htmlFor="comparison-commodity">{t('commodity_label', language)}</label>
@@ -1972,12 +2179,7 @@ export default function App() {
             aria-invalid={Boolean(errors.commodity)}
             className={errors.commodity ? 'has-error' : ''}
             aria-describedby={errors.commodity ? 'comparison-commodity-error' : undefined}
-            onChange={(event) => {
-              setComparisonCommodity(event.target.value)
-              setErrors((current) => ({ ...current, commodity: undefined }))
-              setComparisonResults(null)
-              setDecision(null)
-            }}
+            onChange={(event) => handleComparisonCropChange(event.target.value)}
           >
             <option value="">{t('select_crop', language)}</option>
             {KARNATAKA_CROPS.map((crop) => (
@@ -2008,7 +2210,10 @@ export default function App() {
                     className={optionErrors[option.id]?.name ? 'has-error' : ''}
                     aria-invalid={Boolean(optionErrors[option.id]?.name)}
                     aria-describedby={optionErrors[option.id]?.name ? `${option.id}-name-error` : undefined}
-                    onChange={(event) => updateOption(option.id, { name: event.target.value })}
+                    onChange={(event) => {
+                      const market = backendMarkets.find((item) => item.name === event.target.value)
+                      void selectComparisonMarket(option.id, market ?? (event.target.value ? { name: event.target.value, id: null } : null))
+                    }}
                   >
                     <option value="">{language === 'kn' ? 'ಮಾರುಕಟ್ಟೆ ಆಯ್ಕೆಮಾಡಿ' : 'Select Market'}</option>
                     {/* APMC markets fetched for current district */}
@@ -2034,7 +2239,10 @@ export default function App() {
                   </select>
                   {optionErrors[option.id]?.name && <p className="field-error" id={`${option.id}-name-error`} role="alert">{optionErrors[option.id].name}</p>}
                 </div>
-                {optionField(option, 'price', t('p_label', language), 'number', t('p_helper', language))}
+                {optionField(option, 'price', t('p_label', language), 'number', `${t('p_helper', language)} · ${language === 'kn' ? 'ಎಪಿಎಂಸಿ ಆಯ್ಕೆ ಮಾಡಿದರೆ ಅಧಿಕೃತ ಬೆಲೆ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ತುಂಬುತ್ತದೆ' : 'Selecting an APMC market loads its latest official price'}`)}
+                {comparisonPriceMessages[option.id] && (
+                  <p className="input-helper" role="status">{comparisonPriceMessages[option.id]}</p>
+                )}
                 {optionField(option, 'priceDate', t('observation_date_label', language), 'date')}
                 <div className="input-group">
                   <label htmlFor={`${option.id}-source`}>{t('source_label', language)}</label>

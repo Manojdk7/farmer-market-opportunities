@@ -1042,6 +1042,7 @@ def comparison_result_payload(request: ComparisonRequest, option: dict, selling_
         "price": option["price"],
         "price_unit": option["price_unit"],
         "price_date": option["price_date"].isoformat() if option.get("price_date") else None,
+        "price_observation_id": option.get("price_observation_id"),
         "source": option.get("source"),
         "distance_km": option.get("distance_km"),
         "transport_cost": option["transport_cost"],
@@ -1111,6 +1112,29 @@ def create_comparison(request: ComparisonRequest, db: Session = Depends(get_db))
     for option in request.options:
         if option.market_id is not None and db.get(Market, option.market_id) is None:
             raise HTTPException(status_code=422, detail=f"Unknown market_id for option {option.name}.")
+        if option.price_observation_id is not None:
+            observation = db.get(PriceObservation, option.price_observation_id)
+            if (
+                observation is None
+                or option.market_id != observation.market_id
+                or observation.commodity.casefold() != request.commodity.casefold()
+                or observation.observation_date != option.price_date
+                or observation.data_type != "official"
+                or observation.verification_status != "verified"
+                or observation.is_sample
+            ):
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Selected price observation does not match option {option.name}.",
+                )
+            price_divisors = {"INR/kg": 1, "INR/quintal": 100, "INR/tonne": 1000}
+            divisor = price_divisors.get(observation.unit)
+            observed_price = observation.modal_price or observation.price
+            if divisor is None or abs(option.price - observed_price / divisor) > 0.000001:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"Selected price does not match observation {option.price_observation_id}.",
+                )
 
     created_options = []
     for option in request.options:

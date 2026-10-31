@@ -323,6 +323,59 @@ class BackendAPITests(unittest.TestCase):
         self.assertIsNone(response["winner_selling_option_id"])
         self.assertTrue(response["results"]["missing_information"])
 
+    def test_comparison_persists_selected_apmc_observation_provenance(self):
+        market = Market(name="Comparison APMC", location="Davanagere", district="Davanagere", state="Karnataka", is_active=True, is_sample=False)
+        self.db.add(market)
+        self.db.commit()
+        observation = PriceObservation(
+            market_id=market.id,
+            commodity="Maize",
+            price=2400,
+            modal_price=2400,
+            unit="INR/quintal",
+            observation_date=date.today(),
+            source_name="AGMARKNET 2.0",
+            data_type="official",
+            verification_status="verified",
+            is_sample=False,
+        )
+        self.db.add(observation)
+        self.db.commit()
+
+        request = self.make_comparison([24, 28])
+        request.options[0].market_id = market.id
+        request.options[0].price_observation_id = observation.id
+        request.options[0].price = 24
+        response = create_comparison(request, db=self.db)
+
+        self.assertEqual(response["calculation_inputs"]["options"][0]["price_observation_id"], observation.id)
+        self.assertEqual(response["results"]["items"][0]["price_observation_id"], observation.id)
+
+    def test_comparison_rejects_mismatched_apmc_observation(self):
+        market = Market(name="Mismatched APMC", location="Davanagere", district="Davanagere", state="Karnataka", is_active=True, is_sample=False)
+        self.db.add(market)
+        self.db.commit()
+        observation = PriceObservation(
+            market_id=market.id,
+            commodity="Maize",
+            price=2400,
+            modal_price=2400,
+            unit="INR/quintal",
+            observation_date=date.today(),
+            data_type="official",
+            verification_status="verified",
+            is_sample=False,
+        )
+        self.db.add(observation)
+        self.db.commit()
+
+        request = self.make_comparison([25, 28])
+        request.options[0].market_id = market.id
+        request.options[0].price_observation_id = observation.id
+        with self.assertRaises(HTTPException) as error:
+            create_comparison(request, db=self.db)
+        self.assertEqual(error.exception.status_code, 422)
+
     def test_sync_endpoint_does_not_claim_a_fake_sync(self):
         response = sync_status()
         self.assertIn("agmarknet", response)

@@ -111,6 +111,7 @@ class ComparisonOptionInput(APIModel):
     client_id: str | None = None
     name: str = Field(min_length=1, max_length=160)
     market_id: int | None = None
+    price_observation_id: int | None = Field(default=None, gt=0)
     buyer_name: str | None = Field(default=None, max_length=160)
     price: float = Field(gt=0)
     price_unit: str = Field(min_length=1, max_length=40)

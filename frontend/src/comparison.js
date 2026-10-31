@@ -18,6 +18,8 @@ export function createOption(name = '') {
   return {
     id: globalThis.crypto?.randomUUID?.() ?? `option-${Date.now()}-${Math.random()}`,
     name,
+    marketId: null,
+    priceObservationId: null,
     price: '',
     priceDate: '',
     source: '',
