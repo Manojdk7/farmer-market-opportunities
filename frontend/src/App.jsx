@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   calculateNetProceeds,
   calculatePooledTransport,
@@ -431,6 +431,7 @@ export default function App() {
   const [marketRefreshCount, setMarketRefreshCount] = useState(0)
   const [syncInProgress, setSyncInProgress] = useState(false)
   const [syncMessage, setSyncMessage] = useState('')
+  const marketSyncRequestId = useRef(0)
   const [options, setOptions] = useState(() => loadedCollections.options.records.length
     ? loadedCollections.options.records
     : [createOption(language === 'kn' ? 'ಸ್ಥಳೀಯ ಎಪಿಎಂಸಿ' : 'Local APMC'), createOption(language === 'kn' ? 'ಹತ್ತಿರದ ಮಾರುಕಟ್ಟೆ' : 'Nearby Market')])
@@ -647,27 +648,54 @@ export default function App() {
     return saved.ok
   }
 
-  async function triggerMarketSync() {
+  async function triggerMarketSync(district = selectedDistrict, crop = selectedCrop) {
+    const requestId = ++marketSyncRequestId.current
     setSyncInProgress(true)
     setSyncMessage('')
     try {
-      const res = await fetch(`/api/market-prices/sync?district=${encodeURIComponent(selectedDistrict)}&commodity=${encodeURIComponent(selectedCrop)}`, { method: 'POST' })
+      const res = await fetch(`/api/market-prices/sync?district=${encodeURIComponent(district)}&commodity=${encodeURIComponent(crop)}`, { method: 'POST' })
       if (!res.ok) throw new Error('Sync failed')
       const resultData = await res.json()
-      if (resultData.success) {
+      if (requestId !== marketSyncRequestId.current) return
+      if (resultData.success && resultData.records_synced > 0) {
         setSyncMessage(language === 'kn'
           ? `AGMARKNET ನಿಂದ ${resultData.records_synced} ಬೆಲೆಗಳನ್ನು ನವೀಕರಿಸಲಾಗಿದೆ. ಇತ್ತೀಚಿನ ದಿನಾಂಕ: ${resultData.latest_observation_date || 'ಲಭ್ಯವಿಲ್ಲ'}.`
           : `Synchronized ${resultData.records_synced} prices from AGMARKNET. Latest date: ${resultData.latest_observation_date || 'unavailable'}.`)
+      } else if (resultData.success) {
+        setSyncMessage(language === 'kn'
+          ? `${getLocalizedCropName(crop, language)} ಬೆಳೆಗೆ ${getLocalizedDistrictName(district, language)} ಜಿಲ್ಲೆಯಲ್ಲಿ ಕಳೆದ ವಾರದ AGMARKNET ಬೆಲೆ ದಾಖಲೆಗಳು ಲಭ್ಯವಿಲ್ಲ.`
+          : `AGMARKNET has no price records for ${getLocalizedCropName(crop, language)} in ${getLocalizedDistrictName(district, language)} for the last week.`)
+      } else if (resultData.records_synced > 0) {
+        setSyncMessage(language === 'kn'
+          ? `${resultData.records_synced} ಬೆಲೆಗಳನ್ನು ನವೀಕರಿಸಲಾಗಿದೆ, ಆದರೆ ${resultData.markets_total - resultData.markets_checked} ಮಾರುಕಟ್ಟೆಗಳನ್ನು ಪರಿಶೀಲಿಸಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.`
+          : `Updated ${resultData.records_synced} prices, but could not check ${resultData.markets_total - resultData.markets_checked} markets. Please retry.`)
+      } else if (resultData.markets_checked > 0) {
+        setSyncMessage(language === 'kn'
+          ? `${resultData.markets_total - resultData.markets_checked} ಮಾರುಕಟ್ಟೆಗಳನ್ನು ಪರಿಶೀಲಿಸಲಾಗಲಿಲ್ಲ. ಯಾವುದೇ ಬೆಲೆ ದಾಖಲೆಗಳಿವೆಯೇ ಎಂದು ಖಚಿತಪಡಿಸಲು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.`
+          : `Could not check ${resultData.markets_total - resultData.markets_checked} of ${resultData.markets_total} markets. Retry to confirm whether prices are available.`)
       } else {
-        setSyncMessage(resultData.error || (language === 'kn' ? 'ಬೆಲೆಗಳನ್ನು ನವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.' : 'Could not update prices.'))
+        setSyncMessage(language === 'kn'
+          ? `${getLocalizedDistrictName(district, language)} ಜಿಲ್ಲೆಯ ಮಾರುಕಟ್ಟೆಗಳಿಂದ ಬೆಲೆಗಳನ್ನು ಪಡೆಯಲಾಗಲಿಲ್ಲ. ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.`
+          : `Could not fetch prices from ${getLocalizedDistrictName(district, language)} markets. Check the connection and try again.`)
       }
       setMarketRefreshCount((c) => c + 1)
     } catch {
-      setSyncMessage(language === 'kn' ? 'ಸರ್ವರ್ ಸಂಪರ್ಕ ವಿಫಲವಾಗಿದೆ.' : 'Server connection failed.')
+      if (requestId === marketSyncRequestId.current) {
+        setSyncMessage(language === 'kn' ? 'ಸರ್ವರ್ ಸಂಪರ್ಕ ವಿಫಲವಾಗಿದೆ.' : 'Server connection failed.')
+      }
     } finally {
-      setSyncInProgress(false)
+      if (requestId === marketSyncRequestId.current) setSyncInProgress(false)
     }
   }
+
+  useEffect(() => {
+    if (authState !== 'dashboard' || !browserOnline) return undefined
+    triggerMarketSync(selectedDistrict, selectedCrop)
+    return () => {
+      marketSyncRequestId.current += 1
+      setSyncInProgress(false)
+    }
+  }, [authState, browserOnline, selectedDistrict, selectedCrop])
 
   const handleChange = ({ target: { name, value } }) => {
     setData((current) => ({ ...current, [name]: value }))

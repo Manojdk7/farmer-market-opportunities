@@ -165,8 +165,11 @@ def sync_agmarknet_prices(
 
     records_added = 0
     records_updated = 0
+    markets_checked = 0
     latest_date: date | None = None
     fetch_errors: list[str] = []
+    if not district_mandis:
+        fetch_errors.append(f"No AGMARKNET markets are available for {canonical_district}")
 
     for m in district_mandis:
         market_id = m["id"]
@@ -181,6 +184,7 @@ def sync_agmarknet_prices(
             fetch_errors.append(f"{market_name}: {exc}")
             continue
 
+        markets_checked += 1
         raw_data = res.get("data", [])
         if not raw_data:
             continue
@@ -281,13 +285,16 @@ def sync_agmarknet_prices(
                     records_added += 1
 
     db.commit()
-
     total_synced = records_added + records_updated
+    total_synced = records_added + records_updated
+    sync_succeeded = bool(district_mandis) and not fetch_errors
     LAST_SYNC_STATUS.update(
         {
             "last_synced_at": now_utc.isoformat(),
-            "success": True,
+            "success": sync_succeeded,
             "records_synced": total_synced,
+            "markets_checked": markets_checked,
+            "markets_total": len(district_mandis),
             "latest_observation_date": latest_date.isoformat() if latest_date else None,
             "district": canonical_district,
             "commodity": canonical_crop,
@@ -306,10 +313,12 @@ def sync_agmarknet_prices(
     )
 
     return {
-        "success": True,
+        "success": sync_succeeded,
         "records_synced": total_synced,
         "records_added": records_added,
         "records_updated": records_updated,
+        "markets_checked": markets_checked,
+        "markets_total": len(district_mandis),
         "district": canonical_district,
         "commodity": canonical_crop,
         "latest_observation_date": latest_date.isoformat() if latest_date else None,

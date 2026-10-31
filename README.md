@@ -66,19 +66,19 @@ On startup, an idempotent development seed creates three sample-labelled Karnata
 
 ### Price data trust and sources
 
-The official sources investigated were:
+The app's live market-price sync uses the AGMARKNET portal endpoint. The integration requests last-week prices for the selected Karnataka district and crop when the dashboard is opened or the selection changes. Coverage depends on the records published by AGMARKNET and can vary by district and crop; the app does not invent prices when the source returns no rows. A successful response with no rows means no prices were returned for that query, while failed market requests are reported separately and must not be interpreted as proof that no prices exist.
 
-- [AGMARKNET 2.0](https://agmarknet.gov.in/) — the official portal landing page loaded as a JavaScript application. This inspection confirmed the portal itself, but did not verify a documented public API, a downloadable dataset, its Karnataka commodity coverage, units, or source-record date fields. No AGMARKNET feed or scraper is integrated.
+- [AGMARKNET 2.0](https://agmarknet.gov.in/) — official market-price source accessed through its portal API by `backend/agmarknet_sync.py`. Returned rows are stored with their source, observation date, retrieval time, and unit. This integration does not guarantee that the portal publishes data for every crop/district combination or that each request will succeed.
 - [Open Government Data Platform India](https://www.data.gov.in/) — the portal and a candidate daily market-price resource could not be inspected with the available web access (HTTP 403). Dataset availability, API access, units, dates, and usage terms therefore remain unverified. No OGD API is integrated.
 
-No external price rows are stored as official or verified. The current development seed contains 5 demo observations, 0 verified official observations, and 0 manually entered observations in a newly seeded database. Manual entries are stored with `data_type=manual` and `verification_status=unverified`, even when a source name or URL is supplied. An admin entering a record does not make it independently verified.
+AGMARKNET rows are stored as official/verified only when returned by the configured source integration. A newly seeded development database starts with 5 demo observations; live rows appear only after a successful sync. Manual entries are stored with `data_type=manual` and `verification_status=unverified`, even when a source name or URL is supplied. An admin entering a record does not make it independently verified.
 
 ### Freshness, provenance, and eligibility
 
 - `observation_date` is the date the source says the price was observed. It is not replaced with the entry date.
 - `retrieved_at` means an actual source retrieval/import timestamp. Manual entry and synthetic seed do not populate it.
 - Since records currently store a calendar date, not an observation time, freshness uses UTC calendar days without inventing a time: an observation dated today is recent; an older date is stale; a missing, invalid, or future date is unknown. `PRICE_RECENT_CALENDAR_DAYS` configures the number of UTC calendar days considered recent (default `1`). Date-only data cannot promise an exact rolling 24-hour age.
-- Ranking eligibility is returned per observation with exclusion reasons. Demo, stale/unknown-date, missing-source, invalid-price, missing market/commodity, and unsupported-unit observations are ineligible. Only `INR/kg`, `INR/quintal`, and `INR/tonne` are currently supported. Comparable groups must match commodity, variety, and unit across at least two distinct markets; otherwise the API reports “Insufficient reliable data for ranking.” No market-price ranking or official-data integration is currently performed.
+- Ranking eligibility is returned per observation with exclusion reasons. Demo, stale/unknown-date, missing-source, invalid-price, missing market/commodity, and unsupported-unit observations are ineligible. Only `INR/kg`, `INR/quintal`, and `INR/tonne` are currently supported. Comparable groups must match commodity, variety, and unit across at least two distinct markets; otherwise the API reports “Insufficient reliable data for ranking.”
 - Retrieval/import timestamps, source URLs, and varieties remain blank unless actually available; the application does not fabricate them.
 
 ### Transport-cost sensitivity
@@ -97,6 +97,8 @@ This is a shared development token, not production user authentication: it has n
 
 - `GET /api/markets?district=Davanagere&state=Karnataka` — active stored markets; district/state filters are optional.
 - `GET /api/price-observations?commodity=Maize&limit=20` — stored observations with market location, variety, explicit unit, observation date, retrieval date when available, source name/URL, data type, verification status, freshness, and ranking eligibility/reasons. Optional filters: `market_id`, `commodity`, `from_date`, `to_date`, `data_type`, `freshness`; `limit` is 1–200. Prices retain their explicit units; this endpoint does not convert them.
+- `POST /api/market-prices/sync?district=Davanagere&commodity=Maize` — requests last-week AGMARKNET prices for the selected district and crop; response includes records synced and markets checked. A successful zero-record response means the source returned no rows; check `success`, `markets_checked`, and `markets_total` before treating it as no published data.
+- `GET /api/sync/status` — reports the last background or requested AGMARKNET sync.
 - `GET /api/admin/status` — reports whether manual-entry writes are enabled; never returns the configured secret.
 - `POST /api/price-observations` — adds a validated manual/unverified record and requires `Authorization: Bearer <MARKET_DATA_ADMIN_TOKEN>`. Missing observation date or source can be retained for review but makes the record ineligible for ranking. Retrieval timestamps are not generated for manual entry.
 - `POST /api/calculate` — validated Phase 1 calculation. Existing root fields `gross` and `net_proceeds` remain for frontend compatibility; `breakdown` adds quantity/loss, saleable quantity, quality adjustment, costs, and units. The `l` request field remains a loss fraction (for example `0.05` means 5%).
@@ -171,4 +173,4 @@ cd backend
 .\venv\Scripts\python.exe -m unittest discover -v
 ```
 
-The current data includes synthetic demo rows clearly marked as samples. There is no verified live market-price provider, automatic cloud synchronization beyond the backend's configured database, or production admin identity/role system. The Render/Vercel configuration above is a deployment starting point; complete the hosted smoke tests and configure an authenticated admin workflow before using manual price entry in production.
+The current data includes synthetic demo rows clearly marked as samples. AGMARKNET sync is available, but its source coverage and availability are not guaranteed. There is no production admin identity/role system. The Render/Vercel configuration above is a deployment starting point; complete the hosted smoke tests and configure an authenticated admin workflow before using manual price entry in production.
