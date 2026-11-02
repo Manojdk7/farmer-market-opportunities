@@ -44,8 +44,13 @@ export default function RegisterPage({ language, setLanguage, onRegisterSuccess,
       setError(t('register_err_name_required', language));
       return;
     }
-    if (!cleanUser) {
-      setError(t('login_error_empty', language));
+    if (!cleanUser || cleanUser.length < 3) {
+      setError(t('register_err_username_len', language));
+      return;
+    }
+    const cleanEmail = email.trim();
+    if (cleanEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cleanEmail)) {
+      setError(t('register_err_email_invalid', language));
       return;
     }
     if (!/^[6-9]\d{9}$/.test(cleanMobile)) {

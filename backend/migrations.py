@@ -187,6 +187,7 @@ def migrate_auth_tables(engine: Engine) -> None:
                 cursor.execute(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}")
 
         cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_users_mobile_number ON users (mobile_number) WHERE mobile_number IS NOT NULL")
+        cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS ix_users_email ON users (email) WHERE email IS NOT NULL")
 
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS user_sessions (

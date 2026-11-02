@@ -11,6 +11,7 @@ from typing import Optional
 
 from fastapi import Depends, HTTPException, Request, status
 from pydantic import BaseModel, ConfigDict
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -193,6 +194,9 @@ def create_user(
         clean_email = email.strip().lower()
         if not EMAIL_REGEX.match(clean_email):
             raise ValueError("Invalid email address format.")
+        existing_email = db.query(User).filter(User.email == clean_email).first()
+        if existing_email:
+            raise ValueError("Email address is already registered.")
 
     user = User(
         username=clean_username,
@@ -215,13 +219,39 @@ def create_user(
     return user
 
 
-def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
+def authenticate_user(db: Session, identifier: str, password: str) -> Optional[User]:
     """Verify credentials and return the user, or ``None`` on failure.
+
+    Supports logging in with:
+    1. Username
+    2. Email address (case-insensitive)
+    3. 10-digit Mobile number (with optional +91 or leading 0 stripped)
 
     Returns ``None`` when the user does not exist, is inactive, or the
     password does not match.
     """
-    user = db.query(User).filter(User.username == username).first()
+    clean_id = identifier.strip() if identifier else ""
+    if not clean_id:
+        return None
+
+    # Check if identifier matches a 10-digit mobile number format
+    norm_mobile = clean_id.replace(" ", "").replace("-", "")
+    if norm_mobile.startswith("+91"):
+        norm_mobile = norm_mobile[3:]
+    elif norm_mobile.startswith("0") and len(norm_mobile) == 11:
+        norm_mobile = norm_mobile[1:]
+
+    is_mobile = bool(MOBILE_REGEX.match(norm_mobile))
+    clean_email = clean_id.lower()
+
+    filter_conditions = [
+        User.username == clean_id,
+        User.email == clean_email,
+    ]
+    if is_mobile:
+        filter_conditions.append(User.mobile_number == norm_mobile)
+
+    user = db.query(User).filter(or_(*filter_conditions)).first()
     if user is None:
         return None
     if not user.is_active:

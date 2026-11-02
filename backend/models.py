@@ -153,7 +153,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(256), nullable=False)
     full_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
     mobile_number: Mapped[str | None] = mapped_column(String(15), unique=True, index=True, nullable=True)
-    email: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    email: Mapped[str | None] = mapped_column(String(120), unique=True, index=True, nullable=True)
     district: Mapped[str | None] = mapped_column(String(80), nullable=True)
     preferred_language: Mapped[str] = mapped_column(String(10), default="kn", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)

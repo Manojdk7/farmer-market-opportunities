@@ -72,7 +72,7 @@ export default function LoginPage({ language, setLanguage, onLoginSuccess, onGoT
                   className="login-input"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="admin"
+                  placeholder={t('login_identifier_placeholder', language)}
                   autoComplete="username"
                   autoFocus
                   disabled={loading}
